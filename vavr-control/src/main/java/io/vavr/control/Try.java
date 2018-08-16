@@ -602,22 +602,22 @@ public abstract class Try<T> implements Iterable<T>, Serializable {
     }
 
     /**
-     * Transforms this {@code Try} by applying either {@code onSuccess} to this value or {@code onFailure} to this cause.
+     * Transforms this {@code Try} by applying either {@code ifSuccess} to this value or {@code ifFailure} to this cause.
      *
-     * @param onFailure maps the cause if this is a {@code Failure}
-     * @param onSuccess maps the value if this is a {@code Success}
-     * @param <U>       type of the folded value
+     * @param ifFailure maps the cause if this is a {@code Failure}
+     * @param ifSuccess maps the value if this is a {@code Success}
+     * @param <U>       type of the transformed value
      * @return A new {@code Try} instance
-     * @throws NullPointerException if one of the given {@code onSuccess} or {@code onFailure} is null
+     * @throws NullPointerException if one of the given {@code ifSuccess} or {@code ifFailure} is null
      */
     @SuppressWarnings("unchecked")
-    public <U> Try<U> transform(CheckedFunction<? super Throwable, ? extends Try<? extends U>> onFailure, CheckedFunction<? super T, ? extends Try<? extends U>> onSuccess) {
-        Objects.requireNonNull(onFailure, "onFailure is null");
-        Objects.requireNonNull(onSuccess, "onSuccess is null");
+    public <U> Try<U> transform(CheckedFunction<? super Throwable, ? extends Try<? extends U>> ifFailure, CheckedFunction<? super T, ? extends Try<? extends U>> ifSuccess) {
+        Objects.requireNonNull(ifFailure, "ifFailure is null");
+        Objects.requireNonNull(ifSuccess, "ifSuccess is null");
         try {
             return isSuccess()
-                   ? (Try<U>) onSuccess.apply(get())
-                   : (Try<U>) onFailure.apply(getCause());
+                   ? (Try<U>) ifSuccess.apply(get())
+                   : (Try<U>) ifFailure.apply(getCause());
         } catch (Throwable t) {
             return failure(t);
         }
@@ -637,7 +637,7 @@ public abstract class Try<T> implements Iterable<T>, Serializable {
     /**
      * Computes the hash of this {@code Try}.
      *
-     * @return {@code Objects.hashCode(get())} if this is a success, otherwise {@code Objects.hashCode(getCause())}
+     * @return {@code 31 + Objects.hashCode(get())} if this is a success, otherwise {@code Objects.hashCode(getCause())}
      */
     @Override
     public abstract int hashCode();
@@ -697,7 +697,7 @@ public abstract class Try<T> implements Iterable<T>, Serializable {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(value);
+            return 31 + Objects.hashCode(value);
         }
 
         @Override
