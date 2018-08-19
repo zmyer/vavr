@@ -16,3 +16,7 @@ matrix:
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
+
+cache:
+  directories:
+  - $USER_HOME/.gradle/caches/modules-2/files-2.1
